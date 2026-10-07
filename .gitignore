@@ -1,0 +1,21 @@
+# Local runtimes, generated output and editor state
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+build/
+dist/
+*.log
+*.ini
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+# Signing material never belongs in source control
+*.pfx
+*.p12
+*.pem
+*.key

@@ -1,0 +1,35 @@
+name: Bug report
+description: Report an SR Inqly problem with reproducible steps.
+title: '[Bug] '
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: App version and Windows version
+      placeholder: SR Inqly 2.0.4, Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the tools and actions that cause the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: display
+    attributes:
+      label: Display setup
+      description: Monitor count, resolution and Windows scaling percentage.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or diagnostic details
+      description: Remove personal information before attaching screenshots. Do not post credentials or signing keys.

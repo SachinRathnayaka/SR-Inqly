@@ -1,0 +1,92 @@
+{
+  "cycles": 240,
+  "seconds": 0.24853859993163496,
+  "samples": [
+    {
+      "cycle": 0,
+      "assets": 1,
+      "asset_bytes": 1228800,
+      "working_set": 46161920,
+      "private_bytes": 30240768
+    },
+    {
+      "cycle": 20,
+      "assets": 21,
+      "asset_bytes": 25804800,
+      "working_set": 70844416,
+      "private_bytes": 54951936
+    },
+    {
+      "cycle": 40,
+      "assets": 41,
+      "asset_bytes": 50380800,
+      "working_set": 95535104,
+      "private_bytes": 79659008
+    },
+    {
+      "cycle": 60,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106635264,
+      "private_bytes": 90783744
+    },
+    {
+      "cycle": 80,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106647552,
+      "private_bytes": 90783744
+    },
+    {
+      "cycle": 100,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106659840,
+      "private_bytes": 90779648
+    },
+    {
+      "cycle": 120,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106659840,
+      "private_bytes": 90783744
+    },
+    {
+      "cycle": 140,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106672128,
+      "private_bytes": 90783744
+    },
+    {
+      "cycle": 160,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106676224,
+      "private_bytes": 90783744
+    },
+    {
+      "cycle": 180,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106684416,
+      "private_bytes": 90787840
+    },
+    {
+      "cycle": 200,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106692608,
+      "private_bytes": 90787840
+    },
+    {
+      "cycle": 220,
+      "assets": 50,
+      "asset_bytes": 61440000,
+      "working_set": 106704896,
+      "private_bytes": 90796032
+    }
+  ],
+  "retained_for_undo_before_history_clear": 50,
+  "assets_after_history_clear": 0
+}

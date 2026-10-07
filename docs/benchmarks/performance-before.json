@@ -1,0 +1,9 @@
+{
+  "history_checkpoint_median_ms_tracemalloc": 435.07760006468743,
+  "history_retained_bytes": 17218440,
+  "history_peak_bytes": 17756016,
+  "small_region_paint_median_ms": 59.996599971782416,
+  "strokes": 1000,
+  "points_per_stroke": 100,
+  "snapshots": 15
+}

@@ -1,0 +1,56 @@
+{
+  "scene_raster_cache": true,
+  "antialiasing": true,
+  "frozen": true,
+  "python": "3.13.15",
+  "displays": [
+    {
+      "width": 1536,
+      "height": 960,
+      "dpr": 1.25,
+      "hz": 60.0
+    }
+  ],
+  "idle_seconds": 12.011714499996742,
+  "idle_one_core_cpu_percent": 0.1300813468385736,
+  "checkpoint_median_ms_no_tracemalloc": 8.456399998976849,
+  "cold_full_paint_ms": 99.0384999968228,
+  "warm_region_median_ms": 0.07144999835873023,
+  "warm_region_p95_ms": 0.09169999975711107,
+  "warm_full_median_ms": 0.4523999996308703,
+  "stress_seconds": 30.17886659999931,
+  "stress_cycles": 148,
+  "memory_samples": [
+    {
+      "seconds": 0.15,
+      "working_set": 243204096,
+      "private_bytes": 165584896,
+      "history_bytes": 2453973,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 10.13,
+      "working_set": 267579392,
+      "private_bytes": 190840832,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 20.18,
+      "working_set": 265252864,
+      "private_bytes": 188477440,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 30.17,
+      "working_set": 266334208,
+      "private_bytes": 189526016,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    }
+  ],
+  "history_states": 99,
+  "history_bytes": 3049602,
+  "cache_bytes": 16776640
+}

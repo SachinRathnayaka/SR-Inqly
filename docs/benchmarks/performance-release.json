@@ -1,0 +1,119 @@
+{
+  "scene_raster_cache": true,
+  "antialiasing": true,
+  "frozen": true,
+  "python": "3.13.15",
+  "displays": [
+    {
+      "width": 1536,
+      "height": 960,
+      "dpr": 1.25,
+      "hz": 60.0
+    }
+  ],
+  "idle_seconds": 12.007294499999944,
+  "idle_one_core_cpu_percent": 1.4314215412972573,
+  "checkpoint_median_ms_no_tracemalloc": 8.200500000043576,
+  "cold_full_paint_ms": 107.23289999998542,
+  "warm_region_median_ms": 0.07100000004811591,
+  "warm_region_p95_ms": 0.08090000005722686,
+  "warm_full_median_ms": 0.5676499999935913,
+  "stress_seconds": 120.04739289999998,
+  "stress_cycles": 584,
+  "memory_samples": [
+    {
+      "seconds": 0.16,
+      "working_set": 245182464,
+      "private_bytes": 168632320,
+      "history_bytes": 2453973,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 10.16,
+      "working_set": 270303232,
+      "private_bytes": 193544192,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 20.08,
+      "working_set": 267517952,
+      "private_bytes": 190726144,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 30.09,
+      "working_set": 268525568,
+      "private_bytes": 191549440,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 40.19,
+      "working_set": 268824576,
+      "private_bytes": 191844352,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 50.15,
+      "working_set": 269873152,
+      "private_bytes": 192892928,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 60.13,
+      "working_set": 269111296,
+      "private_bytes": 192118784,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 70.06,
+      "working_set": 269119488,
+      "private_bytes": 192118784,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 80.08,
+      "working_set": 269123584,
+      "private_bytes": 192118784,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 90.04,
+      "working_set": 268861440,
+      "private_bytes": 191852544,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 100.13,
+      "working_set": 269144064,
+      "private_bytes": 192126976,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 110.04,
+      "working_set": 269160448,
+      "private_bytes": 192126976,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    },
+    {
+      "seconds": 120.04,
+      "working_set": 269152256,
+      "private_bytes": 192094208,
+      "history_bytes": 3049602,
+      "cache_bytes": 16776640
+    }
+  ],
+  "history_states": 99,
+  "history_bytes": 3049602,
+  "cache_bytes": 16776640
+}

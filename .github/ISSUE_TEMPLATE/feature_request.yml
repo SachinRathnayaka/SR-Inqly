@@ -1,0 +1,11 @@
+name: Feature request
+description: Suggest a useful annotation workflow.
+title: '[Feature] '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe your workflow and how the feature would help.
+    validations:
+      required: true
