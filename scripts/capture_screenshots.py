@@ -84,7 +84,9 @@ try:
     for i,height in enumerate((45,80,58,105,122,92,146)):
         p.fillRect(35+i*62,190-height,35,height,QColor('#1595df' if i%2 else '#6355df'))
     p.end()
-    doc.marks.append(Mark('image',[(650,560)],image_id=IMAGES.add(captured),image_size=(600,264),rotation=-4))
+    # Show image controls in their own space without obscuring demonstration text.
+    doc.marks = doc.marks[:3]
+    doc.marks.append(Mark('image',[(700,625)],image_id=IMAGES.add(captured),image_size=(400,176),rotation=0))
     t.choose_tool('select');o.selected={len(doc.marks)-1};o.changed.emit()
     screenshot('image-fetcher.png')
     splash=Splash();splash.show();splash.progress(100,'Ready')
