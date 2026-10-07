@@ -30,7 +30,7 @@ try:
     assert image().pixelColor(150,100).alpha()==0
     clock[0]=20;o.trails.begin((100,100),'#40b9ff',5,1,False,3)
     for x in range(101,401):o.trails.append((x,100))
-    o.trails.end();clock[0]=23.45
+    o.trails.end();clock[0]=23.9
     assert abs(image().pixelColor(250,100).alpha()-128)<=2
     o.trails.clear()
     t.neon_check.setChecked(True);t.fade_check.setChecked(True);t.choose_tool('pen')
@@ -50,10 +50,30 @@ try:
     t.choose_tool('highlight');QTest.mousePress(o,Qt.LeftButton,pos=QPoint(200,300))
     assert not o.preview.neon;QTest.mouseRelease(o,Qt.LeftButton,pos=QPoint(350,300))
     from desktop_pen import DesktopPen
+    t.choose_tool('pen')
     raw=DesktopPen(t);raw.enabled=True;o.desktop_neon=True;o.set_click_through(True)
+    t.set_width(12)
+    t.set_color('#57dd9b')
     raw.feed(o.mapToGlobal(QPoint(500,400)),down=True)
     raw.feed(o.mapToGlobal(QPoint(600,400)),up=True)
     assert o.trails.trails[-1].neon and not raw.dragging and o.click_through
+    assert o.trails.trails[-1].width==12
+    assert o.trails.trails[-1].color=='#57dd9b'
+    t.choose_tool('highlight');t.set_width(30)
+    assert o.highlighter_width==30 and o.pen_width==12
+    t.appearance.set_pen_width(8)
+    assert o.highlighter_width==30 and o.width==30 and o.pen_width==8
+    for scale in (75,100,150):
+        t.apply_ui_scale(scale)
+        previous=t.fade_seconds.value()
+        QTest.mouseClick(t.fade_plus,Qt.LeftButton)
+        assert t.fade_seconds.value()==previous+1
+        QTest.mouseClick(t.fade_minus,Qt.LeftButton)
+        assert t.fade_seconds.value()==previous
+    t.toggle_compact()
+    t.appearance.neon.click()
+    assert not o.pen_neon
+    o.desktop_neon=False
     raw.enabled=False;o.trails.clear()
     o.trails.MAX_POINTS=64;o.trails.MAX_TRAILS=4
     for stroke in range(20):

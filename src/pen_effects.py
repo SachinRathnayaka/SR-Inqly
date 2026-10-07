@@ -6,11 +6,30 @@ from PySide6.QtCore import QObject, QTimer, QRectF, QPointF, Qt
 from PySide6.QtGui import QColor, QPen, QPainterPath, QLinearGradient
 
 
+def smooth_path(points):
+    """Midpoint quadratic curves, preserving endpoints without overshooting."""
+    path = QPainterPath(QPointF(*points[0]))
+    if len(points) == 1:
+        path.lineTo(points[0][0]+.01, points[0][1])
+    elif len(points) == 2:
+        path.lineTo(*points[1])
+    else:
+        path.lineTo((QPointF(*points[0])+QPointF(*points[1]))*.5)
+        for i in range(1, len(points)-1):
+            control=QPointF(*points[i]);following=QPointF(*points[i+1])
+            path.quadTo(control,(control+following)*.5)
+        path.lineTo(*points[-1])
+    return path
+
+
+GLOW_LAYERS = ((20,.015),(16,.025),(12,.045),(8,.075),(4,.13))
+
+
 def paint_path(painter, path, color, width, opacity=1.0, neon=False):
     painter.save()
     painter.setBrush(Qt.NoBrush)
     if neon:
-        for extra, alpha in ((14, .07), (8, .13), (4, .23)):
+        for extra, alpha in GLOW_LAYERS:
             painter.setOpacity(opacity * alpha)
             painter.setPen(QPen(QColor(color), width + extra, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             painter.drawPath(path)
@@ -38,7 +57,7 @@ class Trail:
     delay: float
     points: list = field(default_factory=list)
     times: list = field(default_factory=list)
-    fade: float = .9
+    fade: float = 1.8
 
     def bounds(self):
         if not self.points:
@@ -77,11 +96,11 @@ class PenTrails(QObject):
         x,y = point
         if self.active.points and math.dist(point,self.active.points[-1]) < .5:
             return
-        previous = self.active.points[-1] if self.active.points else point
         self.active.points.append((x,y))
         self.active.times.append(self.clock())
         margin = self.active.width + (18 if self.active.neon else 4)
-        dirty = QRectF(QPointF(*previous),QPointF(x,y)).normalized().adjusted(-margin,-margin,margin,margin)
+        xs,ys=zip(*self.active.points[-3:])
+        dirty = QRectF(min(xs),min(ys),max(xs)-min(xs),max(ys)-min(ys)).adjusted(-margin,-margin,margin,margin)
         self.overlay.update(dirty.toAlignedRect())
         self.limit()
         if not self.timer.isActive():self.schedule()
@@ -109,7 +128,7 @@ class PenTrails(QObject):
             self.timer.stop()
             return
         earliest=min(t.times[0]+t.delay for t in self.trails if t.times)
-        self.timer.start(16 if earliest<=now else max(1,math.ceil((earliest-now)*1000)))
+        self.timer.start(8 if earliest<=now else max(1,math.ceil((earliest-now)*1000)))
 
     def tick(self):
         now=self.clock()
@@ -152,28 +171,32 @@ class PenTrails(QObject):
             alphas=[remaining_alpha(now,t,trail.delay,trail.fade) for t in trail.times]
             # Full paths are cheap until their first endpoint starts fading.
             if min(alphas)==1:
-                path=QPainterPath(QPointF(*trail.points[0]))
-                for point in trail.points[1:]:path.lineTo(*point)
-                if len(trail.points)==1:path.lineTo(trail.points[0][0]+.01,trail.points[0][1])
+                path=smooth_path(trail.points)
                 paint_path(painter,path,trail.color,trail.width,trail.opacity,trail.neon)
                 continue
             groups=[];group=None;bucket=None
-            for i in range(max(1,len(trail.points)-1)):
-                a=QPointF(*trail.points[i]);b=QPointF(*trail.points[min(i+1,len(trail.points)-1)])
-                alpha_a=alphas[i];alpha_b=alphas[min(i+1,len(alphas)-1)]
+            points=[QPointF(*p) for p in trail.points]
+            for i,control in enumerate(points):
+                a=points[0] if i==0 else (points[i-1]+control)*.5
+                b=points[-1] if i==len(points)-1 else (control+points[i+1])*.5
+                alpha_a=alphas[0] if i==0 else (alphas[i-1]+alphas[i])*.5
+                alpha_b=alphas[-1] if i==len(points)-1 else (alphas[i]+alphas[i+1])*.5
                 if max(alpha_a,alpha_b)<=0:continue
-                key=round((alpha_a+alpha_b)*32)
+                key=round((alpha_a+alpha_b)*128)
                 if group is None or key!=bucket:
                     group=[QPainterPath(a),a,b,alpha_a,alpha_b]
                     groups.append(group);bucket=key
-                group[0].lineTo(b if a!=b else QPointF(a.x()+.01,a.y()))
+                if i==0 or i==len(points)-1:
+                    group[0].lineTo(b if a!=b else QPointF(a.x()+.01,a.y()))
+                else:
+                    group[0].quadTo(control,b)
                 group[2]=b;group[4]=alpha_b
             # Join near-equal-age segments into continuous paths. Painting each
             # sampled segment separately makes round caps accumulate opacity
             # and prevents dense strokes from fading evenly.
             for path,a,b,alpha_a,alpha_b in groups:
                 painter.save();painter.setOpacity(trail.opacity)
-                layers=((trail.width+14,.07,trail.color),(trail.width+8,.13,trail.color),(trail.width+4,.23,trail.color)) if trail.neon else ()
+                layers=tuple((trail.width+extra,alpha,trail.color) for extra,alpha in GLOW_LAYERS) if trail.neon else ()
                 layers+=((trail.width,1,trail.color),)
                 if trail.neon:layers+=((max(1,trail.width*.3),.8,'#ffffff'),)
                 for width,scale,color in layers:

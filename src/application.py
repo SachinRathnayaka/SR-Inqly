@@ -76,7 +76,8 @@ def draw_mark(painter: QPainter, mark: Mark) -> None:
         for point in pts[1:]:
             path.lineTo(point)
         if mark.kind == 'pen' and mark.neon:
-            if len(pts)==1:path.lineTo(pts[0].x()+.01,pts[0].y())
+            from pen_effects import smooth_path
+            path=smooth_path(mark.points)
             paint_path(painter,path,mark.color,mark.width,mark.opacity,True)
         elif len(pts) == 1:
             painter.drawPoint(pts[0])
@@ -615,9 +616,17 @@ class Overlay(QWidget):
                 if (point-last).manhattanLength() < 0.5:
                     return
                 self.preview.points.append((point.x(), point.y()))
-                self.preview_path.lineTo(point)
+                if self.preview.neon:
+                    from pen_effects import smooth_path
+                    self.preview_path=smooth_path(self.preview.points)
+                    if len(self.preview.points)>2:last=QPointF(*self.preview.points[-3])
+                else:
+                    self.preview_path.lineTo(point)
                 margin = self.preview.width/2 + 3 + (18 if self.preview.neon else 0)
                 dirty = QRectF(last,point).normalized().adjusted(-margin,-margin,margin,margin)
+                if self.preview.neon:
+                    xs,ys=zip(*self.preview.points[-3:])
+                    dirty=QRectF(min(xs),min(ys),max(xs)-min(xs),max(ys)-min(ys)).adjusted(-margin,-margin,margin,margin)
                 self.update(dirty.toAlignedRect())
                 return
             else:
@@ -1035,9 +1044,26 @@ class Toolbar(QWidget):
         self.fade_seconds.setRange(1,15)
         self.fade_seconds.setValue(3)
         self.fade_seconds.setSuffix(' s')
+        self.fade_seconds.setButtonSymbols(QSpinBox.NoButtons)
+        self.fade_seconds.setReadOnly(True)
+        self.fade_seconds.setFocusPolicy(Qt.NoFocus)
+        self.fade_seconds.setCursor(Qt.ArrowCursor)
+        self.fade_seconds.lineEdit().setCursor(Qt.ArrowCursor)
         self.fade_seconds.setToolTip('How long each part remains before smoothly fading')
         for widget in (self.neon_check,self.fade_check,self.fade_seconds):self.effects_row.addWidget(widget)
         body.addLayout(self.effects_row)
+        delay_row = QHBoxLayout()
+        delay_row.addWidget(QLabel('Fade delay'))
+        self.fade_minus = QPushButton('−')
+        self.fade_plus = QPushButton('+')
+        for button,delta in ((self.fade_minus,-1),(self.fade_plus,1)):
+            button.setMinimumSize(38,32)
+            button.setFocusPolicy(Qt.NoFocus)
+            button.setCursor(Qt.ArrowCursor)
+            button.setToolTip('Decrease fade delay' if delta<0 else 'Increase fade delay')
+            button.clicked.connect(lambda _=False,d=delta:self.fade_seconds.setValue(self.fade_seconds.value()+d))
+            delay_row.addWidget(button)
+        body.addLayout(delay_row)
         self.desktop_neon_check = QCheckBox('Desktop neon')
         self.desktop_neon_check.setToolTip('Observe left-click drags across desktop apps. Clicks also activate the underlying apps. Trails always fade.')
         body.addWidget(self.desktop_neon_check)
@@ -1245,6 +1271,7 @@ class Toolbar(QWidget):
             self.overlay.changed.emit()
         else:
             self.overlay.apply_text_style(color=color)
+            self.overlay.pen_color = color
         self.show_status(f"Color {color}")
 
     def pick_color(self) -> None:
@@ -1268,6 +1295,10 @@ class Toolbar(QWidget):
 
     def set_width(self, width: int) -> None:
         self.overlay.width = width
+        if self.overlay.tool == 'highlight':
+            self.overlay.highlighter_width = width
+        else:
+            self.overlay.pen_width = width
         self.size_label.setText(f"{width} px")
 
     def set_opacity(self, value: int) -> None:
@@ -1284,6 +1315,8 @@ class Toolbar(QWidget):
         self.overlay.pen_fade_delay=float(self.fade_seconds.value())
         if not self.overlay.pen_neon and self.desktop_neon_check.isChecked():
             self.desktop_neon_check.setChecked(False)
+        if hasattr(self,'appearance'):
+            self.appearance.apply()
 
     def set_desktop_neon(self, enabled):
         from desktop_pen import DesktopPen
@@ -1297,11 +1330,14 @@ class Toolbar(QWidget):
             return
         self.overlay.desktop_neon=enabled
         if enabled:
+            self.overlay.set_tool('pen')
             self.neon_check.setChecked(True)
             self.overlay.set_click_through(True)
         else:
             self.desktop_pen.disable()
             self.overlay.trails.end()
+        if hasattr(self,'appearance'):
+            self.appearance.apply()
 
     def toggle_click(self) -> None:
         self.overlay.set_click_through(not self.overlay.click_through)

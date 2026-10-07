@@ -5,7 +5,7 @@ Repository name: **SR-Inqly**
 Suggested description: **A Windows screen annotation workspace with drawing, highlighting, inline text and non-destructive screen captures.**  
 Suggested topics: `windows`, `screen-annotation`, `drawing`, `productivity`, `pyside6`, `python`, `screen-capture`, `desktop-app`.
 
-The public repository is `SachinRathnayaka/SR-Inqly`. Version 2.1.0 is a new feature release; publish its prepared assets after pushing the updated source. Preserve the existing 2.0.4 release.
+The public repository is `SachinRathnayaka/SR-Inqly`. Version 2.1.1 is a new feature release; publish its prepared assets after pushing the updated source. Preserve the existing 2.0.4 release.
 
 ## Repository
 
@@ -29,15 +29,15 @@ For GitHub's browser upload, use the source ZIP and upload its contents so `READ
 - Social preview: use `docs/images/banner.png` if GitHub accepts its size; crop/export a copy if the upload UI requests a different aspect ratio.
 - Keep the custom **Source Available** license. Do not select an unrelated MIT/GPL license for original application code.
 
-## Release 2.1.0
+## Release 2.1.1
 
-Create a release with tag `v2.1.0`, title **SR Inqly 2.1.0**, and the notes from `docs/release-notes-2.1.0.md`. Upload these as release assets from `dist/`:
+Create a release with tag `v2.1.1`, title **SR Inqly 2.1.1**, and the notes from `docs/release-notes-2.1.1.md`. Upload these as release assets from `dist/`:
 
 | File | Purpose |
 | --- | --- |
-| `SR.Inqly.Setup.2.1.0.exe` | Per-user Windows installer |
-| `SR-Inqly-2.1.0-Windows-Portable.zip` | Extract and run without installation |
-| `SR-Inqly-2.1.0-Source.zip` | Organized source snapshot, documentation and assets |
-| `SHA256SUMS-2.1.0.txt` | Checksums for these prepared assets |
+| `SR.Inqly.Setup.2.1.1.exe` | Per-user Windows installer |
+| `SR-Inqly-2.1.1-Windows-Portable.zip` | Extract and run without installation |
+| `SR-Inqly-2.1.1-Source.zip` | Organized source snapshot, documentation and assets |
+| `SHA256SUMS-2.1.1.txt` | Checksums for these prepared assets |
 
 Binaries belong in Releases, not in the source repository. If assets are rebuilt or signed, regenerate the checksums. Review applicable third-party distribution terms before a commercial release.

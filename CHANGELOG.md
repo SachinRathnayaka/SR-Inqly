@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.1
+
+- Replace tiny fade spin arrows with large minus/plus buttons and a read-only delay display.
+- Smooth neon paths using quadratic curves consistently during drawing, committed rendering and fade.
+- Soften the glow with five translucent layers, extend the fade to 1.8 seconds and request 8 ms animation updates only while fading.
+- Fix the full width slider not updating the saved width used by Desktop neon.
+- Apply pen color changes immediately to subsequent Desktop neon strokes.
+- Add direct Neon and Desktop neon toggles to the compact toolbar and pen/neon width choices to its color menu.
+- Keep highlighter width independent and preserve normal desktop click behavior.
+
 ## 2.1.0
 
 - Add a neon pen glow using the selected color and shared pen opacity.

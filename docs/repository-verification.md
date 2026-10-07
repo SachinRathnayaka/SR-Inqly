@@ -1,5 +1,16 @@
 # Repository preparation verification
 
+## 2.1.1 controls and smoothing verification — October 7, 2026
+
+- All 22 source/native checks passed after the fixes, including old text-cache, selection, toolbar, Fetcher and DPI regressions.
+- Fade delay minus/plus controls were exercised at 75%, 100% and 150% UI scale.
+- Dense stroke half-fade opacity, expiry, bounded trail data and stopped idle timer passed.
+- Native Raw Input test verified down/up delivery to an underlying Windows window, neon trail creation, width changes and compact effect toggles.
+- The native target window is topmost during this test so another running overlay cannot intercept its injected clicks. Tests must run without simultaneous screenshot capture.
+- Screenshots were refreshed using the generated demonstration canvas, including the new compact effect row.
+
+Smoothing is verified in software. Perceived smoothness on different GPUs, 120/144 Hz displays and mixed-DPI monitor setups still requires physical testing; no fixed FPS is claimed.
+
 ## 2.1.0 pen effects verification — October 7, 2026
 
 - All 22 source/native checks passed after the feature changes. Six headless checks passed during the release build.

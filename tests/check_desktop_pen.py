@@ -32,19 +32,26 @@ def pump(seconds=.2):
 
 try:
     pump();o.display_timer.stop();t.move(10,10)
-    window=user32.CreateWindowExW(0,'STATIC','SR Inqly passive input verification',0x10000000|0x00CF0000,
+    window=user32.CreateWindowExW(0x8,'STATIC','SR Inqly passive input verification',0x10000000|0x00CF0000,
                                 650,300,350,250,None,None,None,None)
     assert window
     user32.SetWindowLongPtrW(window,-4,ctypes.cast(callback,ctypes.c_void_p))
     user32.SetForegroundWindow(window);pump()
     t.desktop_neon_check.setChecked(True);assert o.desktop_neon and t.desktop_pen.enabled and o.click_through
-    user32.SetCursorPos(730,420);pump()
-    user32.mouse_event(0x2,0,0,0,0);pump()
-    for x in range(750,861,20):user32.SetCursorPos(x,420);pump(.04)
-    user32.mouse_event(0x4,0,0,0,0);pump()
+    assert user32.SetCursorPos(730,420), 'Windows could not position the mouse on the input desktop'
+    user32.mouse_event(0x2,0,0,0,0);pump(.01)
+    for x in range(750,861,20):user32.SetCursorPos(x,420);pump(.01)
+    user32.SetCursorPos(860,420);user32.mouse_event(0x4,0,0,0,0);pump(.05)
     assert 0x201 in received and 0x202 in received,received
     assert o.trails.trails and len(o.trails.trails[-1].points)>1
     assert o.trails.trails[-1].neon
+    t.slider.setValue(12)
+    assert o.pen_width==12
+    t.toggle_compact();pump(.05)
+    t.appearance.neon.click()
+    assert not o.pen_neon and not o.desktop_neon and not t.desktop_pen.enabled
+    t.appearance.desktop_neon.click()
+    assert o.desktop_neon and o.pen_neon and t.desktop_pen.enabled
     t.desktop_neon_check.setChecked(False);assert not t.desktop_pen.enabled
     print('PASS: underlying native window receives down/up; raw mouse draws neon while overlay stays click-through; clean unregister')
 finally:

@@ -56,6 +56,19 @@ class Appearance:
         self.color.clicked.connect(self.open_colors)
         row.addWidget(self.color)
         layout.addLayout(row)
+        row = QHBoxLayout()
+        self.neon = QPushButton('Neon')
+        self.desktop_neon = QPushButton('Desktop neon')
+        for button,checkbox in ((self.neon,toolbar.neon_check),(self.desktop_neon,toolbar.desktop_neon_check)):
+            button.setCheckable(True)
+            button.setMinimumHeight(32)
+            button.setFocusPolicy(Qt.NoFocus)
+            button.setCursor(Qt.ArrowCursor)
+            button.clicked.connect(lambda checked=False,c=checkbox:c.setChecked(checked))
+            row.addWidget(button)
+        self.neon.setToolTip('Toggle pen glow; turning off also stops Desktop neon')
+        self.desktop_neon.setToolTip('Toggle temporary desktop neon; normal clicks pass through')
+        layout.addLayout(row)
         root.insertWidget(1,self.panel)
         self.panel.hide()
 
@@ -221,7 +234,19 @@ class Appearance:
             action=delays.addAction(f'{seconds} seconds')
             action.setCheckable(True);action.setChecked(self.t.fade_seconds.value()==seconds)
             action.triggered.connect(lambda _=False,s=seconds:self.t.fade_seconds.setValue(s))
+        widths=menu.addMenu('Pen / neon width')
+        for width in (1,2,4,6,8,12,16,20):
+            action=widths.addAction(f'{width} px')
+            action.setCheckable(True);action.setChecked(self.t.overlay.pen_width==width)
+            action.triggered.connect(lambda _=False,w=width:self.set_pen_width(w))
         menu.popup(self.color.mapToGlobal(QPoint(0,self.color.height())))
+
+    def set_pen_width(self,width):
+        o=self.t.overlay
+        o.pen_width=width
+        if o.tool!='highlight':
+            self.t.set_width(width)
+            self.t.refresh()
 
     def toggle(self):
         self.compact = not self.compact
@@ -236,6 +261,8 @@ class Appearance:
 
     def apply(self):
         t = self.t
+        self.neon.setChecked(t.neon_check.isChecked())
+        self.desktop_neon.setChecked(t.desktop_neon_check.isChecked())
         shape_active = t.overlay.tool in ('select','line','rectangle','ellipse','arrow','fetcher')
         if shape_active:
             self.shape.setProperty('inkIcon',t.overlay.tool)

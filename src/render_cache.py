@@ -14,6 +14,9 @@ class StrokeCommand:
         self.pen=QPen(color,mark.width,Qt.SolidLine,Qt.SquareCap if mark.kind=='highlight' else Qt.RoundCap,Qt.RoundJoin)
         self.opacity=mark.opacity
         self.neon=getattr(mark,'neon',False) and mark.kind=='pen'
+        if self.neon:
+            from pen_effects import smooth_path
+            self.path=smooth_path(mark.points)
     def size(self):return self.path.elementCount()*24+256
     def boundingRect(self):
         margin=self.pen.widthF()+2+(18 if self.neon else 0)
