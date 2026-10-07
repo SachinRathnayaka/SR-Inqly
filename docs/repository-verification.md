@@ -1,5 +1,16 @@
 # Repository preparation verification
 
+## 2.1.0 pen effects verification — October 7, 2026
+
+- All 22 source/native checks passed after the feature changes. Six headless checks passed during the release build.
+- Temporal pixel tests verified that earlier stroke regions fade before later ones, fade alpha is smooth, and the animation timer stops after trails expire.
+- Permanent neon cache pixels, Undo/Redo, glow bounds, highlighter isolation and temporary trail memory limits passed.
+- A native Windows test window received left mouse down/up while passive raw mouse input simultaneously generated a neon trail; disabling Desktop neon unregistered the observer.
+- Text editing, compact controls, toolbar hit masks and UI scaling passed at 75–150%.
+- README screenshots were regenerated on a generated canvas. No private desktop screenshots were added.
+
+The 2.1.0 packaged EXE passed icon DLLs, desktop startup, toolbar reachability, Escape and clean exit. Inno Setup compiled the installer; portable/source archives passed ZIP integrity checks and SHA-256 sums were generated. Installation/uninstallation was not repeated. The sections below describe the original 2.0.4 repository preparation.
+
 Prepared on **October 7, 2026** from the existing SR Inqly **2.0.4** source. No GitHub repository or release was created by the preparation process.
 
 ## Source migration

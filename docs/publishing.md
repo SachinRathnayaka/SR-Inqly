@@ -1,24 +1,19 @@
 # Publish the prepared repository
 
-Suggested name: **sr-inqly**  
+Repository name: **SR-Inqly**
+
 Suggested description: **A Windows screen annotation workspace with drawing, highlighting, inline text and non-destructive screen captures.**  
 Suggested topics: `windows`, `screen-annotation`, `drawing`, `productivity`, `pyside6`, `python`, `screen-capture`, `desktop-app`.
 
-The source is prepared for `SachinRathnayaka/sr-inqly`. These instructions do not imply that a remote repository or release already exists.
+The public repository is `SachinRathnayaka/SR-Inqly`. Version 2.1.0 is a new feature release; publish its prepared assets after pushing the updated source. Preserve the existing 2.0.4 release.
 
 ## Repository
 
-1. Create a new **public** GitHub repository named `sr-inqly`.
-2. When using Git, leave GitHub's automatic README/license/gitignore creation unchecked because these files are already supplied.
-3. Open a terminal in the prepared `sr-inqly` folder and run:
+Open the existing **SR-Inqly** repository in GitHub Desktop, commit the updated source if needed and select **Push origin**. For an existing Git checkout:
 
 ```powershell
-git init -b main
-git add .
 git status --short
-git commit -m "Prepare SR Inqly 2.0.4 public source repository"
-git remote add origin https://github.com/SachinRathnayaka/sr-inqly.git
-git push -u origin main
+git push origin main
 ```
 
 Before `git add .`, verify that `.gitignore` is present. The prepared folder's `build/` and `dist/` output is ignored. Never commit signing credentials, private keys or private desktop screenshots.
@@ -34,15 +29,15 @@ For GitHub's browser upload, use the source ZIP and upload its contents so `READ
 - Social preview: use `docs/images/banner.png` if GitHub accepts its size; crop/export a copy if the upload UI requests a different aspect ratio.
 - Keep the custom **Source Available** license. Do not select an unrelated MIT/GPL license for original application code.
 
-## Release 2.0.4
+## Release 2.1.0
 
-Create a release with tag `v2.0.4`, title **SR Inqly 2.0.4**, and the notes from `docs/release-notes-2.0.4.md`. Upload these as release assets from `dist/`:
+Create a release with tag `v2.1.0`, title **SR Inqly 2.1.0**, and the notes from `docs/release-notes-2.1.0.md`. Upload these as release assets from `dist/`:
 
 | File | Purpose |
 | --- | --- |
-| `SR Inqly Setup 2.0.4.exe` | Per-user Windows installer |
-| `SR-Inqly-2.0.4-Windows-Portable.zip` | Extract and run without installation |
-| `SR-Inqly-2.0.4-Source.zip` | Organized source snapshot, documentation and assets |
-| `SHA256SUMS-2.0.4.txt` | Checksums for these prepared assets |
+| `SR.Inqly.Setup.2.1.0.exe` | Per-user Windows installer |
+| `SR-Inqly-2.1.0-Windows-Portable.zip` | Extract and run without installation |
+| `SR-Inqly-2.1.0-Source.zip` | Organized source snapshot, documentation and assets |
+| `SHA256SUMS-2.1.0.txt` | Checksums for these prepared assets |
 
 Binaries belong in Releases, not in the source repository. If assets are rebuilt or signed, regenerate the checksums. Review applicable third-party distribution terms before a commercial release.

@@ -18,7 +18,7 @@ from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, QAbstractN
 from PySide6.QtGui import QColor, QFont, QGuiApplication, QImage, QKeySequence, QPainter, QPainterPath, QPen, QRegion
 from PySide6.QtWidgets import (
     QApplication, QColorDialog, QFileDialog, QFrame, QHBoxLayout, QLabel,
-    QFontComboBox, QSpinBox, QScrollArea, QSizePolicy, QMessageBox, QPushButton, QSlider, QVBoxLayout, QWidget,
+    QFontComboBox, QSpinBox, QScrollArea, QSizePolicy, QMessageBox, QPushButton, QSlider, QVBoxLayout, QWidget, QCheckBox,
 )
 
 from document_model import Document, Mark, TextStyle
@@ -29,6 +29,7 @@ from appearance import Appearance
 from render_cache import RenderCache, SceneCache
 from image_capture import Fetcher, draw_image, image_path
 from branding import NAME, VERSION, resource
+from pen_effects import PenTrails, paint_path
 
 
 TOOLS = ["select", "pen", "highlight", "line", "rectangle", "ellipse", "arrow", "text", "eraser", "fetcher"]
@@ -74,7 +75,10 @@ def draw_mark(painter: QPainter, mark: Mark) -> None:
         path = QPainterPath(pts[0])
         for point in pts[1:]:
             path.lineTo(point)
-        if len(pts) == 1:
+        if mark.kind == 'pen' and mark.neon:
+            if len(pts)==1:path.lineTo(pts[0].x()+.01,pts[0].y())
+            paint_path(painter,path,mark.color,mark.width,mark.opacity,True)
+        elif len(pts) == 1:
             painter.drawPoint(pts[0])
         else:
             painter.drawPath(path)
@@ -120,6 +124,11 @@ class Overlay(QWidget):
         self.highlighter_width = 20
         self.opacity = 1.0
         self.highlight_opacity = 1.0
+        self.pen_neon = False
+        self.pen_auto_fade = False
+        self.pen_fade_delay = 3.0
+        self.desktop_neon = False
+        self.trails = PenTrails(self)
         self.selected: set[int] = set()
         self.selection_mode = "smart"
         self.selection_operation = "replace"
@@ -326,6 +335,7 @@ class Overlay(QWidget):
         self.update()
 
     def cancel_gesture(self) -> None:
+        self.trails.end()
         self.fetcher.cancel()
         self.preview = None
         self.selection_points.clear()
@@ -450,6 +460,7 @@ class Overlay(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         self.scene_cache.paint(painter, self.document.marks, QRectF(_event.rect()), self.size(), self.devicePixelRatioF(),
                               self.text_editor.index if self.text_editor else None)
+        self.trails.paint(painter,QRectF(_event.rect()))
         if self.preview:
             if self.preview.kind in ('pen', 'highlight') and len(self.preview.points) > 1:
                 color = QColor(self.preview.color)
@@ -458,7 +469,10 @@ class Overlay(QWidget):
                 painter.save()
                 painter.setOpacity(self.preview.opacity)
                 painter.setPen(QPen(color,self.preview.width,Qt.SolidLine,Qt.SquareCap if self.preview.kind=="highlight" else Qt.RoundCap,Qt.RoundJoin))
-                painter.drawPath(self.preview_path)
+                if self.preview.neon:
+                    paint_path(painter,self.preview_path,self.preview.color,self.preview.width,self.preview.opacity,True)
+                else:
+                    painter.drawPath(self.preview_path)
                 painter.restore()
             else:
                 draw_mark(painter, self.preview)
@@ -499,6 +513,9 @@ class Overlay(QWidget):
         point = event.position()
         x, y = point.x(), point.y()
         self.drag_start = point
+        if self.tool == 'pen' and self.pen_auto_fade:
+            self.trails.begin((x,y),self.color,self.width,self.opacity,self.pen_neon,self.pen_fade_delay)
+            return
         if self.tool == "select":
             if self.selection_mode in ("smart", "move"):
                 hit = self.hit_mark(x, y)
@@ -544,7 +561,8 @@ class Overlay(QWidget):
             kind = "highlight" if self.tool == "highlight" else self.tool
             width = self.width
             self.preview = Mark(kind, [(x, y)], self.color, width,
-                                opacity=self.highlight_opacity if kind == "highlight" else self.opacity)
+                                opacity=self.highlight_opacity if kind == "highlight" else self.opacity,
+                                neon=self.pen_neon and kind=='pen')
             self.preview_path = QPainterPath(point)
         self.update()
 
@@ -565,6 +583,9 @@ class Overlay(QWidget):
             self.update()
             return
         if not (event.buttons() & Qt.MouseButton.LeftButton):
+            return
+        if self.trails.active is not None:
+            self.trails.append((point.x(),point.y()))
             return
         if self.tool == "select" and self.originals and self.drag_start:
             dirty=QRectF(self.fetcher.bar.geometry()).united(self.selection_region.boundingRect())
@@ -595,7 +616,7 @@ class Overlay(QWidget):
                     return
                 self.preview.points.append((point.x(), point.y()))
                 self.preview_path.lineTo(point)
-                margin = self.preview.width/2 + 3
+                margin = self.preview.width/2 + 3 + (18 if self.preview.neon else 0)
                 dirty = QRectF(last,point).normalized().adjusted(-margin,-margin,margin,margin)
                 self.update(dirty.toAlignedRect())
                 return
@@ -612,6 +633,13 @@ class Overlay(QWidget):
         if event.button() != Qt.MouseButton.LeftButton:
             return
         if self.fetcher.release(event):
+            return
+        if self.trails.active is not None:
+            self.trails.append((event.position().x(),event.position().y()))
+            self.trails.end()
+            self.drag_start=None
+            self.trails.schedule()
+            self.changed.emit()
             return
         if self.tool == "select" and self.selection_points:
             if self.selection_mode in ("box", "smart") and self.box_dragged:
@@ -661,6 +689,9 @@ class Overlay(QWidget):
     def undo(self) -> None:
         if self.text_editor:
             self.text_editor.input.undo()
+            return
+        if self.trails.undo():
+            self.changed.emit()
             return
         if self.document.undo():
             self.deselect()
@@ -713,6 +744,7 @@ class Overlay(QWidget):
 
     def clear(self) -> None:
         self.finish_text()
+        self.trails.clear()
         self.document.clear()
         self.deselect()
         self.changed.emit()
@@ -783,7 +815,7 @@ class Toolbar(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.setStyleSheet("""
             QWidget#panel { background: #171d2b; border: 1px solid #40506a; border-radius: 15px; }
-            QLabel { color: #edf3ff; border: none; }
+            QLabel, QCheckBox { color: #edf3ff; border: none; }
             QComboBox, QSpinBox { color: #edf3ff; background: #293348; border: 1px solid #43516a;
                                  border-radius: 5px; padding: 4px; font-size: 12px; }
             QScrollArea, QScrollArea > QWidget > QWidget { background: #171d2b; border: none; }
@@ -800,7 +832,7 @@ class Toolbar(QWidget):
         root.setContentsMargins(12, 10, 12, 12)
         root.setSpacing(8)
         header = QHBoxLayout()
-        self.title = QLabel("SR Inqly 2.0.4")
+        self.title = QLabel(f'{NAME} {VERSION}')
         self.title.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.title.setStyleSheet("font-size: 13px; font-weight: 700; color: #d8f5ff;")
         header.addWidget(self.title)
@@ -993,6 +1025,26 @@ class Toolbar(QWidget):
         self.opacity_label = QLabel("100%")
         opacity_row.addWidget(self.opacity_label)
         body.addLayout(opacity_row)
+
+        self.effects_row = QHBoxLayout()
+        self.neon_check = QCheckBox('Neon')
+        self.neon_check.setToolTip('Pen glow in the selected color')
+        self.fade_check = QCheckBox('Fade')
+        self.fade_check.setToolTip('Temporary pen: fades along the drawn path; excluded from redo history')
+        self.fade_seconds = QSpinBox()
+        self.fade_seconds.setRange(1,15)
+        self.fade_seconds.setValue(3)
+        self.fade_seconds.setSuffix(' s')
+        self.fade_seconds.setToolTip('How long each part remains before smoothly fading')
+        for widget in (self.neon_check,self.fade_check,self.fade_seconds):self.effects_row.addWidget(widget)
+        body.addLayout(self.effects_row)
+        self.desktop_neon_check = QCheckBox('Desktop neon')
+        self.desktop_neon_check.setToolTip('Observe left-click drags across desktop apps. Clicks also activate the underlying apps. Trails always fade.')
+        body.addWidget(self.desktop_neon_check)
+        self.neon_check.toggled.connect(self.set_pen_effects)
+        self.fade_check.toggled.connect(self.set_pen_effects)
+        self.fade_seconds.valueChanged.connect(self.set_pen_effects)
+        self.desktop_neon_check.toggled.connect(self.set_desktop_neon)
 
         self.action_buttons = {}
         for entries in (
@@ -1226,6 +1278,31 @@ class Toolbar(QWidget):
             self.overlay.opacity = value / 100
             self.overlay.apply_text_style(opacity=value / 100)
 
+    def set_pen_effects(self, *_):
+        self.overlay.pen_neon=self.neon_check.isChecked()
+        self.overlay.pen_auto_fade=self.fade_check.isChecked()
+        self.overlay.pen_fade_delay=float(self.fade_seconds.value())
+        if not self.overlay.pen_neon and self.desktop_neon_check.isChecked():
+            self.desktop_neon_check.setChecked(False)
+
+    def set_desktop_neon(self, enabled):
+        from desktop_pen import DesktopPen
+        if not hasattr(self,'desktop_pen'):
+            self.desktop_pen=DesktopPen(self)
+        if enabled and not self.desktop_pen.enable():
+            self.desktop_neon_check.blockSignals(True)
+            self.desktop_neon_check.setChecked(False)
+            self.desktop_neon_check.blockSignals(False)
+            self.show_status('Desktop neon unavailable; use Pen + Neon')
+            return
+        self.overlay.desktop_neon=enabled
+        if enabled:
+            self.neon_check.setChecked(True)
+            self.overlay.set_click_through(True)
+        else:
+            self.desktop_pen.disable()
+            self.overlay.trails.end()
+
     def toggle_click(self) -> None:
         self.overlay.set_click_through(not self.overlay.click_through)
 
@@ -1358,6 +1435,7 @@ class Toolbar(QWidget):
         for mark in self.overlay.document.marks:
             # Marks already use coordinates relative to the virtual overlay.
             draw_mark(painter, mark)
+        self.overlay.trails.paint(painter,QRectF(0,0,geometry.width(),geometry.height()))
         painter.end()
         if overlay_was_visible:
             self.overlay.show()
@@ -1414,6 +1492,8 @@ class Toolbar(QWidget):
         QApplication.quit()
 
     def closeEvent(self, event) -> None:
+        if hasattr(self,'desktop_pen'):self.desktop_pen.disable()
+        self.overlay.trails.clear()
         if getattr(self,'persist_settings',False):
             from preferences import save
             save(self)

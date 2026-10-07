@@ -19,7 +19,7 @@ Run these commands from the repository root. Source resources resolve from `asse
 .\.venv\Scripts\python.exe scripts/run_checks.py --all
 ```
 
-The headless suite checks the document, command/raster caches, memory accounting, cache eviction and stale-text regression. Native checks use Windows desktop focus and may change the clipboard. Output screenshots and test fixtures go under the ignored `build/test-artifacts/` directory.
+The six headless checks cover the document, command/raster caches, memory accounting, cache eviction, stale text and temporal pen effects. Native checks include a passive Desktop neon drag over an underlying test window; they use desktop focus and may change the clipboard. Do not run native checks alongside screenshot capture or another GUI test. Output screenshots and test fixtures go under the ignored `build/test-artifacts/` directory.
 
 The package check requires `dist/SR Inqly/SR Inqly.exe`. It checks normal startup, desktop input release, toolbar reachability, Esc and process exit. It is included in the release script.
 
@@ -34,12 +34,12 @@ powershell -ExecutionPolicy Bypass -File scripts/build_release.ps1 `
 `-CompilerPath` is optional when the compiler is in a detected location. The script builds `packaging/windows.spec` and `packaging/installer.iss`. It generates:
 
 - `dist/SR Inqly/SR Inqly.exe` and its `_internal` runtime folder.
-- `dist/SR Inqly Setup 2.0.4.exe`.
-- `dist/SR-Inqly-2.0.4-Windows-Portable.zip`.
-- `dist/SR-Inqly-2.0.4-Source.zip`.
-- `dist/SHA256SUMS-2.0.4.txt`.
+- `dist/SR.Inqly.Setup.2.1.0.exe` (the packaging script copies the Inno filename to this release asset name).
+- `dist/SR-Inqly-2.1.0-Windows-Portable.zip`.
+- `dist/SR-Inqly-2.1.0-Source.zip`.
+- `dist/SHA256SUMS-2.1.0.txt`.
 
-Version 2.0.4 remains the application version because the repository preparation does not add a new software feature. Future version changes must update `src/branding.py`, the toolbar caption in `src/application.py`, `packaging/windows_version.txt`, `packaging/installer.iss`, the changelog and release documentation together.
+Version 2.1.0 remains the application version because the repository preparation does not add a new software feature. Future version changes must update `src/branding.py`, the toolbar caption in `src/application.py`, `packaging/windows_version.txt`, `packaging/installer.iss`, the changelog and release documentation together.
 
 The PyInstaller spec deliberately excludes incompatible unversioned ICU DLLs that can otherwise cause QtCore import failures. Preserve that exclusion.
 

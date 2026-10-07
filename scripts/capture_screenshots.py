@@ -89,6 +89,14 @@ try:
     doc.marks.append(Mark('image',[(700,625)],image_id=IMAGES.add(captured),image_size=(400,176),rotation=0))
     t.choose_tool('select');o.selected={len(doc.marks)-1};o.changed.emit()
     screenshot('image-fetcher.png')
+    # Real effect controls and selected-color neon paths, without private content.
+    o.selected.clear();doc.marks=doc.marks[:3]
+    doc.marks.append(Mark('pen',[(565+i*7,735+math.sin(i/7)*22) for i in range(80)],'#a895ff',5,neon=True))
+    t.toggle_compact();t.move(40,50);t.choose_tool('pen')
+    t.neon_check.setChecked(True);t.fade_check.setChecked(True)
+    o.trails.begin((565,625),'#40b9ff',6,1,True,15)
+    for i in range(1,80):o.trails.append((565+i*7,625+math.sin(i/7)*22))
+    o.trails.end();screenshot('pen-effects.png');o.trails.clear()
     splash=Splash();splash.show();splash.progress(100,'Ready')
     assert splash.grab().save(str(output/'splash.png'));splash.close()
     banner=QImage(1440,470,QImage.Format_ARGB32_Premultiplied)

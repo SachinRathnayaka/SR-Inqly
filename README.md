@@ -4,7 +4,7 @@
 
 **A compact Windows workspace for drawing, highlighting and explaining anything on your screen.**
 
-![Version 2.0.4](https://img.shields.io/badge/version-2.0.4-7357ff)
+![Version 2.1.0](https://img.shields.io/badge/version-2.1.0-7357ff)
 ![Windows 10 and 11](https://img.shields.io/badge/platform-Windows_10_%2F_11-0078d4)
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776ab)
 ![Source Available](https://img.shields.io/badge/license-Source_Available-dca843)
@@ -23,7 +23,7 @@ SR Inqly places a transparent annotation layer over your Windows desktop. Use it
 
 ![SR Inqly full toolbar with annotations](docs/images/interface-full.png)
 
-*Actual SR Inqly 2.0.4 controls and annotations over a generated demonstration canvas. Screenshots contain no personal desktop files.*
+*Actual SR Inqly 2.1.0 controls and annotations over a generated demonstration canvas. Screenshots contain no personal desktop files.*
 
 | Compact workspace | Light theme |
 | --- | --- |
@@ -38,6 +38,9 @@ SR Inqly places a transparent annotation layer over your Windows desktop. Use it
 | Feature | How it helps |
 | --- | --- |
 | **Draw over Windows apps** | Pen, line, arrow, rectangle and ellipse tools for explanations and quick sketches. |
+| **Neon pen** | A glow in your selected ink color, with permanent or temporary strokes. |
+| **Temporary pen trails** | Hold each part for 1–15 seconds, then smoothly fade from the start of the drawn path. |
+| **Desktop neon** | Optional click-through mouse trails while ordinary desktop clicks and drags continue. |
 | **Highlight with separate settings** | The marker keeps its own color, width and opacity, independent of the pen and other tools. |
 | **Edit text in place** | Type directly into a movable text box with a blinking caret; adjust color, size, spacing, font, alignment and background. |
 | **Select and move annotations** | Smart selection and group movement, with additional rectangle, lasso and polygon selection options. |
@@ -50,11 +53,11 @@ SR Inqly places a transparent annotation layer over your Windows desktop. Use it
 
 ## Get started
 
-Download **SR Inqly 2.0.4** from the [official release](https://github.com/SachinRathnayaka/SR-Inqly/releases/tag/v2.0.4). Choose the Windows installer or portable ZIP below.
+Download **SR Inqly 2.1.0** from the [official release](https://github.com/SachinRathnayaka/SR-Inqly/releases/tag/v2.1.0). Choose the Windows installer or portable ZIP below.
 
 ### Windows installer
 
-1. Download [`SR.Inqly.Setup.2.0.4.exe`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.0.4/SR.Inqly.Setup.2.0.4.exe).
+1. Download [`SR.Inqly.Setup.2.1.0.exe`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.0/SR.Inqly.Setup.2.1.0.exe).
 2. Run the installer and follow the setup wizard.
 3. Open **SR Inqly** from the Start menu. A desktop shortcut is optional during installation.
 
@@ -62,7 +65,7 @@ The installer uses a per-user location under `%LOCALAPPDATA%\Programs\SR Inqly`.
 
 ### Portable version
 
-1. Download [`SR-Inqly-2.0.4-Windows-Portable.zip`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.0.4/SR-Inqly-2.0.4-Windows-Portable.zip).
+1. Download [`SR-Inqly-2.1.0-Windows-Portable.zip`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.0/SR-Inqly-2.1.0-Windows-Portable.zip).
 2. Use **Extract All** to extract the complete archive.
 3. Open `SR Inqly.exe` and keep its `_internal` folder beside it.
 
@@ -73,6 +76,14 @@ Python is included in packaged builds; end users do not need to install it. Curr
 The app starts in desktop mode. Click a tool to begin drawing. Click the active tool again—or press **Esc**—to return to desktop mode. Tool highlights clear when drawing is inactive. Click a tool to resume.
 
 Use **Theme** for appearance, cursor settings and About. The developer name shows information on hover; the separate **GitHub** button opens the official profile after releasing desktop input.
+
+### Neon and fading pen
+
+Choose **Pen**, then tick **Neon** for a glow or **Fade** for temporary strokes. The delay selector controls how long each part remains visible before fading. Compact mode exposes these options inside the color dropdown.
+
+**Desktop neon · mouse stays usable** is a separate opt-in mode. Left-button drags draw fading trails while the underlying app still receives those clicks and drags. It is off after each restart. Temporary trails are not selectable and cannot be restored with Redo. [Behavior and limits](docs/pen-effects.md).
+
+![Neon and temporary pen controls](docs/images/pen-effects.png)
 
 ## Tools and shortcuts
 
@@ -94,7 +105,7 @@ Global shortcuts can be affected by conflicts with other Windows applications. K
 
 Choose **Text**, then click to create a text box. Click existing text to edit it. Use the side grip to move the box and its width handle to resize it. The floating bar gives quick access to color, font size, letter spacing and delete; expand the main toolbar for more formatting controls.
 
-Version 2.0.4 fixes the stale text rendering that could leave old characters visible after editing or moving a text box.
+The stale-text fix introduced in 2.0.4 remains included: editing or moving a text box clears the old rendered characters.
 
 ### Fetcher
 

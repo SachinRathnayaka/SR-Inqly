@@ -1,4 +1,4 @@
-#define AppVersion "2.0.4"
+#define AppVersion "2.1.0"
 [Setup]
 SourceDir=..
 AppId={{35954A3A-2729-4C3F-9309-EA4673ED9AF9}

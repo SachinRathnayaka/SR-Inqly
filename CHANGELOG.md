@@ -1,6 +1,16 @@
 # Changelog
 
-This source repository starts from the verified 2.0.4 application. Preparing the repository reorganizes filenames, imports, resource paths and build scripts; it does not introduce a new product version.
+## 2.1.0
+
+- Add a neon pen glow using the selected color and shared pen opacity.
+- Add temporary pen trails with a 1–15 second hold and smooth 0.9 second fade in drawing order.
+- Add opt-in Desktop neon: passive Windows raw mouse input draws fading trails while normal desktop clicks continue.
+- Expose effects below opacity in the full toolbar and inside the compact color menu.
+- Keep temporary trails separate from permanent annotations and redo history; Undo removes the newest visible trail first.
+- Stop animation while idle and bound temporary stroke memory. Do not persist Desktop neon across restarts.
+- Include native click-through and temporal rendering regressions.
+
+This source repository started from the verified 2.0.4 application.
 
 ## 2.0.4
 

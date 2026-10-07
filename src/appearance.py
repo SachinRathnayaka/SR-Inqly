@@ -210,6 +210,17 @@ class Appearance:
             from PySide6.QtGui import QIcon
             action = menu.addAction(QIcon(pixmap),name)
             action.triggered.connect(lambda _=False,c=color:self.t.set_color(c))
+        menu.addSeparator()
+        for text,checkbox in (('Neon pen',self.t.neon_check),('Temporary pen fade',self.t.fade_check),
+                              ('Desktop neon · clicks pass through',self.t.desktop_neon_check)):
+            action=menu.addAction(text)
+            action.setCheckable(True);action.setChecked(checkbox.isChecked())
+            action.toggled.connect(checkbox.setChecked)
+        delays=menu.addMenu('Fade delay')
+        for seconds in (1,3,5,10,15):
+            action=delays.addAction(f'{seconds} seconds')
+            action.setCheckable(True);action.setChecked(self.t.fade_seconds.value()==seconds)
+            action.triggered.connect(lambda _=False,s=seconds:self.t.fade_seconds.setValue(s))
         menu.popup(self.color.mapToGlobal(QPoint(0,self.color.height())))
 
     def toggle(self):

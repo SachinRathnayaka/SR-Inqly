@@ -20,8 +20,9 @@ try:
  a.open_shapes();app.processEvents();menu=t.findChildren(QMenu)[-1]
  assert len(menu.actions())==6
  menu.actions()[4].trigger();menu.close();assert o.tool=='arrow'
- a.open_colors();app.processEvents();menu=t.findChildren(QMenu)[-1]
- assert len(menu.actions())==7
+ a.open_colors();app.processEvents();menu=next(m for m in t.findChildren(QMenu) if any(a.text()=='Red' for a in m.actions()))
+ assert [a.text() for a in menu.actions()[:7]]==['Red','Yellow','Green','Blue','Purple','White','Black']
+ assert any(a.text()=='Neon pen' and a.isCheckable() for a in menu.actions())
  menu.actions()[1].trigger();menu.close();assert o.color=='#ffcb3d'
  for scale in (75,150,100):
   t.apply_ui_scale(scale);app.processEvents();assert not t.scale_slider.isVisible()

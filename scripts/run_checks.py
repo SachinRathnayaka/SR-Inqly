@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
-HEADLESS = ('document', 'performance', 'scene_cache', 'cache_eviction', 'text_cache_move')
+HEADLESS = ('document', 'performance', 'scene_cache', 'cache_eviction', 'text_cache_move', 'pen_effects')
 parser = argparse.ArgumentParser()
 parser.add_argument('--all', action='store_true', help='Run native Windows UI checks too; affects focus and clipboard.')
 parser.add_argument('--headless', action='store_true', help='Run model/renderer checks without a desktop.')

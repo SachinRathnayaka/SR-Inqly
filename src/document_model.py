@@ -43,6 +43,7 @@ class Mark:
     flip_x: bool = False
     flip_y: bool = False
     crop: tuple[float, float, float, float] = (0, 0, 1, 1)
+    neon: bool = False
 
     def moved(self, dx: float, dy: float) -> "Mark":
         result = deepcopy(self)
@@ -57,7 +58,7 @@ class Mark:
         if not self.points:
             return (0, 0, 0, 0)
         xs, ys = zip(*self.points)
-        extra = max(self.width, 8)
+        extra = max(self.width, 8) + (18 if self.neon and self.kind == 'pen' else 0)
         if self.kind == "text":
             if self.text_box:
                 return (xs[0], ys[0], xs[0] + self.text_box[0], ys[0] + self.text_box[1])

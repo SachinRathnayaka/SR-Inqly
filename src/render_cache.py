@@ -13,11 +13,16 @@ class StrokeCommand:
         if mark.kind=='highlight':color.setAlpha(105)
         self.pen=QPen(color,mark.width,Qt.SolidLine,Qt.SquareCap if mark.kind=='highlight' else Qt.RoundCap,Qt.RoundJoin)
         self.opacity=mark.opacity
+        self.neon=getattr(mark,'neon',False) and mark.kind=='pen'
     def size(self):return self.path.elementCount()*24+256
     def boundingRect(self):
-        margin=self.pen.widthF()+2
+        margin=self.pen.widthF()+2+(18 if self.neon else 0)
         return self.path.boundingRect().adjusted(-margin,-margin,margin,margin)
     def paint(self,painter):
+        if self.neon:
+            from pen_effects import paint_path
+            paint_path(painter,self.path,self.pen.color().name(),self.pen.widthF(),self.opacity,True)
+            return
         painter.save();painter.setOpacity(self.opacity);painter.setPen(self.pen);painter.setBrush(Qt.NoBrush);painter.drawPath(self.path);painter.restore()
 
 

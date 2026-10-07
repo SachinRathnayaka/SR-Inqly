@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 NAME = 'SR Inqly'
-VERSION = '2.0.4'
+VERSION = '2.1.0'
 DEVELOPER = 'Sachin Rathnayaka'
 GITHUB = 'https://github.com/SachinRathnayaka'
 COPYRIGHT = 'Copyright © 2026 Sachin Rathnayaka. All Rights Reserved.'
