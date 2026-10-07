@@ -50,11 +50,11 @@ SR Inqly places a transparent annotation layer over your Windows desktop. Use it
 
 ## Get started
 
-Prepared release version: **2.0.4**. Release files are published under the repository's **Releases** tab when a release is created; the source tree does not contain installer binaries.
+Download **SR Inqly 2.0.4** from the [official release](https://github.com/SachinRathnayaka/SR-Inqly/releases/tag/v2.0.4). Choose the Windows installer or portable ZIP below.
 
 ### Windows installer
 
-1. Download `SR Inqly Setup 2.0.4.exe` from a published release.
+1. Download [`SR.Inqly.Setup.2.0.4.exe`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.0.4/SR.Inqly.Setup.2.0.4.exe).
 2. Run the installer and follow the setup wizard.
 3. Open **SR Inqly** from the Start menu. A desktop shortcut is optional during installation.
 
@@ -62,7 +62,7 @@ The installer uses a per-user location under `%LOCALAPPDATA%\Programs\SR Inqly`.
 
 ### Portable version
 
-1. Download `SR-Inqly-2.0.4-Windows-Portable.zip` from a published release.
+1. Download [`SR-Inqly-2.0.4-Windows-Portable.zip`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.0.4/SR-Inqly-2.0.4-Windows-Portable.zip).
 2. Use **Extract All** to extract the complete archive.
 3. Open `SR Inqly.exe` and keep its `_internal` folder beside it.
 
@@ -117,14 +117,12 @@ Drag the image to move it, a corner to resize it, or the handle above it to rota
 The source layout is organized for a normal GitHub checkout. Recommended development environment: **Windows 10/11, Python 3.13**, with the tested dependencies pinned in the requirements files.
 
 ```powershell
-git clone https://github.com/SachinRathnayaka/sr-inqly.git
-cd sr-inqly
+git clone https://github.com/SachinRathnayaka/SR-Inqly.git
+cd SR-Inqly
 py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe run.py
 ```
-
-The clone URL applies after the repository is published at the suggested owner/name.
 
 ### Check the source
 
@@ -184,7 +182,7 @@ Historical reports refer to earlier builds and their original filenames; [the cu
 
 ## Feedback
 
-Have a reproducible problem or a useful workflow idea? Use the repository's **Issues** tab and the supplied templates after publication. See [CONTRIBUTING.md](CONTRIBUTING.md) for feedback and development guidance, and [SECURITY.md](SECURITY.md) for sensitive reports.
+Have a reproducible problem or a useful workflow idea? Use the repository's [Issues](https://github.com/SachinRathnayaka/SR-Inqly/issues) tab and the supplied templates. See [CONTRIBUTING.md](CONTRIBUTING.md) for feedback and development guidance, and [SECURITY.md](SECURITY.md) for sensitive reports.
 
 ## License
 
