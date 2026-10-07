@@ -14,7 +14,7 @@ from pathlib import Path
 from datetime import datetime
 from uuid import uuid4
 
-from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, QAbstractNativeEventFilter, Signal, QStandardPaths, QTimer
+from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, QAbstractNativeEventFilter, Signal, QStandardPaths, QTimer, QEventLoop
 from PySide6.QtGui import QColor, QFont, QGuiApplication, QImage, QKeySequence, QPainter, QPainterPath, QPen, QRegion
 from PySide6.QtWidgets import (
     QApplication, QColorDialog, QFileDialog, QFrame, QHBoxLayout, QLabel,
@@ -1447,38 +1447,52 @@ class Toolbar(QWidget):
 
     def capture(self) -> QImage:
         """Capture the desktop without app chrome, then paint annotations above it."""
-        self.overlay.finish_text()
+        if getattr(self,'_capture_busy',False):raise RuntimeError('Screen capture already in progress')
+        screens=QGuiApplication.screens()
+        if not screens:raise ValueError('No display is available')
         geometry = virtual_geometry()
-        scale = max(screen.devicePixelRatio() for screen in QGuiApplication.screens())
-        image = QImage(int(geometry.width() * scale), int(geometry.height() * scale),
-                       QImage.Format.Format_ARGB32)
-        image.fill(Qt.GlobalColor.transparent)
+        scale = max(screen.devicePixelRatio() for screen in screens)
+        width,height=math.ceil(geometry.width()*scale),math.ceil(geometry.height()*scale)
+        if width<=0 or height<=0 or width*height>32_000_000:
+            raise ValueError('Screenshot exceeds 32 million pixels; use a smaller Fetcher region')
+        image=QImage(width,height,QImage.Format_ARGB32)
+        if image.isNull():raise MemoryError('Not enough memory for a screenshot')
+        self.overlay.finish_text()
         overlay_was_visible = self.overlay.isVisible()
-        self.hide()
-        self.overlay.hide()
-        QApplication.processEvents()
-        time.sleep(0.15)  # Let Desktop Window Manager reveal windows behind the overlay.
-        painter = QPainter(image)
-        for screen in QGuiApplication.screens():
-            rect = screen.geometry()
-            shot = screen.grabWindow(0)
-            dest = QRectF((rect.x() - geometry.x()) * scale,
-                          (rect.y() - geometry.y()) * scale,
-                          rect.width() * scale, rect.height() * scale)
-            painter.drawPixmap(dest, shot, QRectF(shot.rect()))
-        painter.scale(scale, scale)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        for mark in self.overlay.document.marks:
-            # Marks already use coordinates relative to the virtual overlay.
-            draw_mark(painter, mark)
-        self.overlay.trails.paint(painter,QRectF(0,0,geometry.width(),geometry.height()))
-        painter.end()
-        if overlay_was_visible:
-            self.overlay.show()
-        self.show()
-        self.sync_input_region()
-        self.overlay.set_click_through(True)
+        toolbar_was_visible=self.isVisible();was_click_through=self.overlay.click_through
+        self._capture_busy=True;painter=None
+        try:
+            self.hide();self.overlay.hide()
+            # Give DWM time to reveal the desktop while Qt timers remain active.
+            wait=QEventLoop();QTimer.singleShot(150,wait.quit);wait.exec()
+            if getattr(self,'_closing',False):raise RuntimeError('Application is closing')
+            image.fill(Qt.transparent);painter=QPainter(image)
+            for screen in QGuiApplication.screens():
+                rect=screen.geometry();shot=screen.grabWindow(0)
+                if shot.isNull():raise ValueError('Windows did not provide screen pixels')
+                dest=QRectF((rect.x()-geometry.x())*scale,(rect.y()-geometry.y())*scale,rect.width()*scale,rect.height()*scale)
+                painter.drawPixmap(dest,shot,QRectF(shot.rect()))
+            painter.scale(scale,scale);painter.setRenderHint(QPainter.Antialiasing)
+            for mark in self.overlay.document.marks:draw_mark(painter,mark)
+            self.overlay.trails.paint(painter,QRectF(0,0,geometry.width(),geometry.height()))
+        finally:
+            if painter:painter.end()
+            if not getattr(self,'_closing',False):
+                if overlay_was_visible:self.overlay.show()
+                if toolbar_was_visible:self.show()
+                self.sync_input_region();self.overlay.set_click_through(was_click_through)
+            self._capture_busy=False
         return image
+
+    def write_screenshot(self,image,path):
+        from png_writer import PngWriter
+        if not hasattr(self,'png_writer'):self.png_writer=PngWriter(self)
+        self.png_writer.submit(image,str(path),self.screenshot_saved)
+        self.show_status('Saving screenshot…')
+
+    def screenshot_saved(self,path,ok,error):
+        self.show_status(f'Saved {path}' if ok else f'Screenshot failed: {error}')
+        self.appearance.quick_button.setToolTip(f'Saved: {path}' if ok else f'Screenshot failed: {error}')
 
     def save_png(self) -> None:
         self.overlay.set_click_through(True)
@@ -1488,11 +1502,8 @@ class Toolbar(QWidget):
         if path:
             if not path.lower().endswith(".png"):
                 path += ".png"
-            image = self.capture()
-            if image.save(path, "PNG"):
-                self.show_status(f"Saved {path}")
-            else:
-                QMessageBox.warning(self, "Export failed", f"Could not save {path}")
+            try:self.write_screenshot(self.capture(),path)
+            except Exception as error:self.show_status('Screenshot failed: '+str(error))
 
     def quick_screenshot(self) -> None:
         """Save to the Windows Pictures location without a destination dialog."""
@@ -1505,19 +1516,18 @@ class Toolbar(QWidget):
             folder.mkdir(parents=True, exist_ok=True)
             filename = f"SR Inqly {datetime.now():%Y-%m-%d %H-%M-%S-%f}-{uuid4().hex[:8]}.png"
             path = folder / filename
-            if not self.capture().save(str(path), "PNG"):
-                raise OSError(f"Could not save {path}")
-            self.show_status(f"Saved {path}")
-            self.appearance.quick_button.setToolTip(f"Saved: {path}")
-        except OSError as error:
+            self.write_screenshot(self.capture(),str(path))
+        except Exception as error:
             self.show_status(f"Screenshot failed: {error}")
             self.appearance.quick_button.setToolTip(f"Screenshot failed: {error}")
         finally:
             self.overlay.set_click_through(was_click_through)
 
     def copy_png(self) -> None:
-        QApplication.clipboard().setImage(self.capture())
-        self.show_status("Annotated screenshot copied to clipboard")
+        try:
+            QApplication.clipboard().setImage(self.capture())
+            self.show_status("Annotated screenshot copied to clipboard")
+        except Exception as error:self.show_status('Screenshot failed: '+str(error))
 
     def close_app(self) -> None:
         if sys.platform == "win32":
@@ -1528,6 +1538,8 @@ class Toolbar(QWidget):
         QApplication.quit()
 
     def closeEvent(self, event) -> None:
+        self._closing=True
+        if hasattr(self,'png_writer'):self.png_writer.pool.waitForDone()
         if hasattr(self,'desktop_pen'):self.desktop_pen.disable()
         self.overlay.trails.clear()
         if getattr(self,'persist_settings',False):

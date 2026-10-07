@@ -78,6 +78,14 @@ class Mark:
         if not (left - 6 <= x <= right + 6 and top - 6 <= y <= bottom + 6):
             return False
         if self.kind in ("pen", "line", "arrow") and len(self.points) >= 2:
+            if self.kind == 'pen' and self.neon:
+                from pen_effects import smooth_path
+                from PySide6.QtGui import QPainterPathStroker
+                from PySide6.QtCore import QPointF, Qt
+                stroker=QPainterPathStroker()
+                stroker.setWidth(max(18,2*(self.width+4)))
+                stroker.setCapStyle(Qt.RoundCap);stroker.setJoinStyle(Qt.RoundJoin)
+                return stroker.createStroke(smooth_path(self.points)).contains(QPointF(x,y))
             for a, b in zip(self.points, self.points[1:]):
                 vx, vy = b[0] - a[0], b[1] - a[1]
                 length2 = vx * vx + vy * vy

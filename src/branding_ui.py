@@ -1,6 +1,7 @@
 """Startup progress and lightweight developer information."""
 import logging
-from PySide6.QtCore import Qt, QUrl, QPropertyAnimation, QEventLoop
+from PySide6 import __version__ as PYSIDE_VERSION
+from PySide6.QtCore import qVersion, Qt, QUrl, QPropertyAnimation, QEventLoop
 from PySide6.QtGui import QColor, QPainter, QLinearGradient, QPixmap, QDesktopServices, QIcon
 from PySide6.QtWidgets import QWidget, QApplication, QLabel, QPushButton, QHBoxLayout, QMessageBox
 from branding import NAME, VERSION, DEVELOPER, GITHUB, COPYRIGHT, SOURCE_MODEL, LICENSE_SUMMARY, resource
@@ -40,7 +41,7 @@ def show_about(parent):
     fg=parent.appearance.foreground
     box.setStyleSheet(f'QMessageBox {{background-color:{bg};color:{fg};}} QLabel {{background:transparent;color:{fg};}} QPushButton {{background:{bg};color:{fg};border:1px solid {fg};padding:6px 18px;}}')
     box.setTextFormat(Qt.RichText)
-    box.setText(f'<h2>{NAME} {VERSION}</h2>Developed by {DEVELOPER}<br><a style="color:{fg}" href="{GITHUB}">GitHub</a><br><br>{COPYRIGHT}<br>{SOURCE_MODEL}<br><br>{LICENSE_SUMMARY}')
+    box.setText(f'<h2>{NAME} {VERSION}</h2>Developed by {DEVELOPER}<br><a style="color:{fg}" href="{GITHUB}">GitHub</a><br><br>{COPYRIGHT}<br>{SOURCE_MODEL}<br><br>{LICENSE_SUMMARY}<br><br>Uses Qt {qVersion()} / PySide6 {PYSIDE_VERSION}.<br>Qt &copy; The Qt Company Ltd. and contributors.<br>Third-party license texts and source links: THIRD_PARTY_NOTICES.md and licenses/ in the application folder.')
     box.exec()
 
 

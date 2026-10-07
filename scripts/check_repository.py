@@ -22,4 +22,9 @@ for path in ('README.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore','run.py
     if not (ROOT/path).is_file():failures.append(f'Missing required file: {path}')
 if failures:
     print('\n'.join(failures));raise SystemExit(1)
-print(f'PASS: local links in {len(documents)} documents; Python syntax and required public files')
+sys.path.insert(0,str(ROOT/'src'))
+from branding import VERSION
+from release_tools import source_files,validate_versions
+validate_versions(ROOT,VERSION)
+source_files(ROOT)
+print(f'PASS: release version and public source gate; local links in {len(documents)} documents; Python syntax and required public files')

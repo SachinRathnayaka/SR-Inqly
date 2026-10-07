@@ -1,5 +1,6 @@
 """Bounded temporary pen trails; no document snapshots or idle polling."""
 from dataclasses import dataclass, field
+from bisect import bisect_right
 import math
 import time
 from PySide6.QtCore import QObject, QTimer, QRectF, QPointF, Qt
@@ -58,13 +59,39 @@ class Trail:
     points: list = field(default_factory=list)
     times: list = field(default_factory=list)
     fade: float = 1.8
+    _geometry: object = field(default=None,repr=False)
+    _bounds: object = field(default=None,repr=False)
+
+    def invalidate(self):
+        self._geometry=None;self._bounds=None
+
+    def geometry(self):
+        if self._geometry is not None:return self._geometry
+        points=[QPointF(*p) for p in self.points]
+        pieces=[];group=None;bucket=None
+        for i,control in enumerate(points):
+            a=points[0] if i==0 else (points[i-1]+control)*.5
+            b=points[-1] if i==len(points)-1 else (control+points[i+1])*.5
+            ta=self.times[0] if i==0 else (self.times[i-1]+self.times[i])*.5
+            tb=self.times[-1] if i==len(points)-1 else (self.times[i]+self.times[i+1])*.5
+            key=int((ta-self.times[0])/.025)
+            if group is None or key!=bucket:
+                group=[QPainterPath(a),a,b,ta,tb]
+                pieces.append(group);bucket=key
+            if i==0 or i==len(points)-1:group[0].lineTo(b if a!=b else QPointF(a.x()+.01,a.y()))
+            else:group[0].quadTo(control,b)
+            group[2]=b;group[4]=tb
+        self._geometry=(smooth_path(self.points),pieces)
+        return self._geometry
 
     def bounds(self):
+        if self._bounds is not None:return self._bounds
         if not self.points:
             return QRectF()
         xs, ys = zip(*self.points)
         margin = self.width + (18 if self.neon else 4)
-        return QRectF(min(xs), min(ys), max(xs)-min(xs), max(ys)-min(ys)).adjusted(-margin,-margin,margin,margin)
+        self._bounds=QRectF(min(xs), min(ys), max(xs)-min(xs), max(ys)-min(ys)).adjusted(-margin,-margin,margin,margin)
+        return self._bounds
 
 
 class PenTrails(QObject):
@@ -98,6 +125,7 @@ class PenTrails(QObject):
             return
         self.active.points.append((x,y))
         self.active.times.append(self.clock())
+        self.active.invalidate()
         margin = self.active.width + (18 if self.active.neon else 4)
         xs,ys=zip(*self.active.points[-3:])
         dirty = QRectF(min(xs),min(ys),max(xs)-min(xs),max(ys)-min(ys)).adjusted(-margin,-margin,margin,margin)
@@ -118,6 +146,7 @@ class PenTrails(QObject):
                 trail=self.trails[0]
                 self.overlay.update(trail.bounds().toAlignedRect())
                 del trail.points[:1024];del trail.times[:1024]
+                trail.invalidate()
 
     def schedule(self):
         if not self.trails:
@@ -139,11 +168,11 @@ class PenTrails(QObject):
             if now>=trail.times[0]+trail.delay:
                 self.overlay.update(trail.bounds().toAlignedRect())
             # Keep one expired endpoint to interpolate the moving fade boundary.
-            count=0
-            while count+1<len(trail.times) and now>=trail.times[count+1]+trail.delay+trail.fade:
-                count+=1
-            if count:
+            count=max(0,bisect_right(trail.times,now-trail.delay-trail.fade)-1)
+            # Prune in batches so geometry remains reusable across fade frames.
+            if count>=1024:
                 del trail.points[:count];del trail.times[:count]
+                trail.invalidate()
             if now<trail.times[-1]+trail.delay+trail.fade or trail is self.active:
                 kept.append(trail)
         self.trails=kept
@@ -168,33 +197,18 @@ class PenTrails(QObject):
         for trail in self.trails:
             if not trail.bounds().intersects(region):
                 continue
-            alphas=[remaining_alpha(now,t,trail.delay,trail.fade) for t in trail.times]
+            path,pieces=trail.geometry()
             # Full paths are cheap until their first endpoint starts fading.
-            if min(alphas)==1:
-                path=smooth_path(trail.points)
+            if now<=trail.times[0]+trail.delay:
                 paint_path(painter,path,trail.color,trail.width,trail.opacity,trail.neon)
                 continue
-            groups=[];group=None;bucket=None
-            points=[QPointF(*p) for p in trail.points]
-            for i,control in enumerate(points):
-                a=points[0] if i==0 else (points[i-1]+control)*.5
-                b=points[-1] if i==len(points)-1 else (control+points[i+1])*.5
-                alpha_a=alphas[0] if i==0 else (alphas[i-1]+alphas[i])*.5
-                alpha_b=alphas[-1] if i==len(points)-1 else (alphas[i]+alphas[i+1])*.5
-                if max(alpha_a,alpha_b)<=0:continue
-                key=round((alpha_a+alpha_b)*128)
-                if group is None or key!=bucket:
-                    group=[QPainterPath(a),a,b,alpha_a,alpha_b]
-                    groups.append(group);bucket=key
-                if i==0 or i==len(points)-1:
-                    group[0].lineTo(b if a!=b else QPointF(a.x()+.01,a.y()))
-                else:
-                    group[0].quadTo(control,b)
-                group[2]=b;group[4]=alpha_b
             # Join near-equal-age segments into continuous paths. Painting each
             # sampled segment separately makes round caps accumulate opacity
             # and prevents dense strokes from fading evenly.
-            for path,a,b,alpha_a,alpha_b in groups:
+            for path,a,b,ta,tb in pieces:
+                alpha_a=remaining_alpha(now,ta,trail.delay,trail.fade)
+                alpha_b=remaining_alpha(now,tb,trail.delay,trail.fade)
+                if max(alpha_a,alpha_b)<=0:continue
                 painter.save();painter.setOpacity(trail.opacity)
                 layers=tuple((trail.width+extra,alpha,trail.color) for extra,alpha in GLOW_LAYERS) if trail.neon else ()
                 layers+=((trail.width,1,trail.color),)

@@ -1,0 +1,21 @@
+{
+  "method": "800x500 QImage, antialiasing, neon width 5, ordered one-second path, fade at t=2.2, 2 warmups + median of 5 paints; same inputs on HEAD 2.1.1 and local 2.1.2",
+  "results": [
+    {
+      "points": 801,
+      "2.1.1_median_ms": 31.338,
+      "2.1.2_median_ms": 10.008
+    },
+    {
+      "points": 6318,
+      "2.1.1_median_ms": 62.003,
+      "2.1.2_median_ms": 26.272
+    },
+    {
+      "points": 12616,
+      "2.1.1_median_ms": 84.959,
+      "2.1.2_median_ms": 31.757
+    }
+  ],
+  "scope": "Offscreen cached completed fade strokes; not live-input latency or end-to-end FPS."
+}

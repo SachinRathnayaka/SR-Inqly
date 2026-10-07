@@ -4,7 +4,7 @@
 
 **A compact Windows workspace for drawing, highlighting and explaining anything on your screen.**
 
-![Version 2.1.1](https://img.shields.io/badge/version-2.1.1-7357ff)
+![Version 2.1.2](https://img.shields.io/badge/version-2.1.2-7357ff)
 ![Windows 10 and 11](https://img.shields.io/badge/platform-Windows_10_%2F_11-0078d4)
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776ab)
 ![Source Available](https://img.shields.io/badge/license-Source_Available-dca843)
@@ -53,11 +53,11 @@ SR Inqly places a transparent annotation layer over your Windows desktop. Use it
 
 ## Get started
 
-Download **SR Inqly 2.1.1** from the [official release](https://github.com/SachinRathnayaka/SR-Inqly/releases/tag/v2.1.1). Choose the Windows installer or portable ZIP below.
+Download **SR Inqly 2.1.2** from the [official release](https://github.com/SachinRathnayaka/SR-Inqly/releases/tag/v2.1.2). Choose the Windows installer or portable ZIP below.
 
 ### Windows installer
 
-1. Download [`SR.Inqly.Setup.2.1.1.exe`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.1/SR.Inqly.Setup.2.1.1.exe).
+1. Download [`SR.Inqly.Setup.2.1.2.exe`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.2/SR.Inqly.Setup.2.1.2.exe).
 2. Run the installer and follow the setup wizard.
 3. Open **SR Inqly** from the Start menu. A desktop shortcut is optional during installation.
 
@@ -65,7 +65,7 @@ The installer uses a per-user location under `%LOCALAPPDATA%\Programs\SR Inqly`.
 
 ### Portable version
 
-1. Download [`SR-Inqly-2.1.1-Windows-Portable.zip`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.1/SR-Inqly-2.1.1-Windows-Portable.zip).
+1. Download [`SR-Inqly-2.1.2-Windows-Portable.zip`](https://github.com/SachinRathnayaka/SR-Inqly/releases/download/v2.1.2/SR-Inqly-2.1.2-Windows-Portable.zip).
 2. Use **Extract All** to extract the complete archive.
 3. Open `SR Inqly.exe` and keep its `_internal` folder beside it.
 
@@ -187,7 +187,7 @@ SR Inqly uses incremental freehand paths, dirty redraw regions and a reusable ra
 
 [Performance review](docs/reports/performance-review.md) · [Optimization audit](docs/reports/optimization-audit.md) · [Measurement files](docs/benchmarks)
 
-Measurements are offscreen rendering diagnostics, not a guarantee of end-to-end FPS. Physical mixed-DPI multi-monitor hotplug, dual 4K displays, 120/144 Hz, sleep/wake and exclusive fullscreen applications still need hardware testing. Pressure-aware stylus rendering is not implemented. Quick PNG encoding is synchronous. A 30–60 minute soak is still outstanding.
+Measurements are offscreen rendering diagnostics, not a guarantee of end-to-end FPS. Physical mixed-DPI multi-monitor hotplug, dual 4K displays, 120/144 Hz, sleep/wake and exclusive fullscreen applications still need hardware testing. Pressure-aware stylus rendering is not implemented. Quick PNG encoding runs in a bounded background worker. A 30–60 minute soak is still outstanding.
 
 Historical reports refer to earlier builds and their original filenames; [the current build guide](docs/building.md) describes this repository's layout.
 
@@ -199,7 +199,7 @@ Have a reproducible problem or a useful workflow idea? Use the repository's [Iss
 
 **Source Available — Copyright © 2026 Sachin Rathnayaka. All Rights Reserved.**
 
-Source viewing, learning, personal study and personal evaluation are permitted under [LICENSE](LICENSE). Commercial exploitation, unauthorized redistribution, rebranding and publishing modified versions require prior written permission. A public GitHub repository does not change these terms.
+The official app is free for personal/non-commercial use. Commercial app use requires prior written permission. Source viewing, learning, personal study and personal evaluation are permitted under [LICENSE](LICENSE). Commercial exploitation, unauthorized redistribution, rebranding and publishing modified versions require prior written permission. A public GitHub repository does not change these terms.
 
 Qt/PySide6, Python, PyInstaller, Inno Setup and other bundled components retain their own licenses and rights. Read [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [licenses/](licenses/) before distributing builds. This project is not represented as an unrestricted open-source release.
 

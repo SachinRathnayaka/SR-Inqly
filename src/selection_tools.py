@@ -31,9 +31,13 @@ def mark_footprint(mark: Mark) -> QPainterPath:
         else:
             path.addEllipse(rect)
     else:
-        path.moveTo(points[0])
-        for point in points[1:]:
-            path.lineTo(point)
+        if mark.kind=='pen' and mark.neon:
+            from pen_effects import smooth_path
+            path=smooth_path(mark.points)
+        else:
+            path.moveTo(points[0])
+            for point in points[1:]:
+                path.lineTo(point)
         if mark.kind == "arrow":
             angle = math.atan2(points[-1].y() - points[0].y(), points[-1].x() - points[0].x())
             length = max(12, mark.width * 4)

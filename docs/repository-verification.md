@@ -1,5 +1,16 @@
 # Repository preparation verification
 
+## 2.1.2 audit repairs — October 7, 2026
+
+- 24 source/native regression checks passed, including actual Windows desktop input, Fetcher capture, text cleanup, tool toggles and the new audit regressions.
+- Added headless coverage for curved neon hit/area/erase, capture allocation rejection/failure restoration, responsive DWM wait, cached time-binned fade geometry, source manifests, checksum mismatches and version mismatches.
+- The same completed fading neon path rendered in 10.008 / 26.272 / 31.757 ms for 801 / 6318 / 12616 points versus 31.338 / 62.003 / 84.959 ms on 2.1.1. These are warmed offscreen medians, not end-to-end FPS. See `benchmarks/pen-fade-2.1.2.json` for inputs and scope.
+- Source packaging now uses tracked/staged public files (or the prepared ZIP manifest), validates paths and known secret patterns, and rejects signing material. This is not a guarantee against every possible sensitive file.
+- The public 2.1.1 portable download differed from its checksum; replacement checksum is generated from the actual downloaded artifacts. Installer/source matched.
+- The app is free for personal/non-commercial use; commercial use requires developer permission. Original source distribution/rebranding restrictions remain.
+- Trusted signing certificate absent; output remains unsigned. Physical mixed-DPI/high-refresh/sleep-wake and a long-duration soak are outstanding.
+
+
 ## 2.1.1 controls and smoothing verification — October 7, 2026
 
 - All 22 source/native checks passed after the fixes, including old text-cache, selection, toolbar, Fetcher and DPI regressions.

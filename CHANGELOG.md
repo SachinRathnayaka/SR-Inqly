@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.2 — 2026-10-07
+
+- Match neon hit testing and region selection to the rendered curve.
+- Cache fade geometry in time bins and use binary search for expiry.
+- Save PNG screenshots in a bounded background worker; restore UI on capture failure and cap capture allocation.
+- Package tracked source only, reject private material patterns, and include a source manifest for ZIP builds.
+- Fail packaging on inconsistent versions, corrupt ZIPs or stale release checksums.
+- Clarify free personal/non-commercial application use and commercial permission requirements.
+- Expand headless regressions and document signing and third-party runtime sources.
+
+
 ## 2.1.1
 
 - Replace tiny fade spin arrows with large minus/plus buttons and a read-only delay display.
@@ -13,7 +24,7 @@
 ## 2.1.0
 
 - Add a neon pen glow using the selected color and shared pen opacity.
-- Add temporary pen trails with a 1–15 second hold and smooth 0.9 second fade in drawing order.
+- Add temporary pen trails with a 1â€“15 second hold and smooth 0.9 second fade in drawing order.
 - Add opt-in Desktop neon: passive Windows raw mouse input draws fading trails while normal desktop clicks continue.
 - Expose effects below opacity in the full toolbar and inside the compact color menu.
 - Keep temporary trails separate from permanent annotations and redo history; Undo removes the newest visible trail first.
